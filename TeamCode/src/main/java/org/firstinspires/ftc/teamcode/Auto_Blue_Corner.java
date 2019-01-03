@@ -22,6 +22,10 @@ public class Auto_Blue_Corner extends Auto {
 		Vector center = new Vector();
 		Vector right = new Vector();
 		
+		double leftR = 0;
+		double centerR = 0;
+		double rightR = 0;
+		
 		String calibrationFilePath = "/sdcard/FIRST/Auto_Blue_Setup.txt";
 		
 		try {
@@ -40,10 +44,13 @@ public class Auto_Blue_Corner extends Auto {
 			
 			left.x = Double.valueOf(data[0]);
 			left.y = Double.valueOf(data[1]);
-			center.x = Double.valueOf(data[2]);
-			center.y = Double.valueOf(data[3]);
-			right.x = Double.valueOf(data[4]);
-			right.y = Double.valueOf(data[5]);
+			leftR = Double.valueOf(data[2]);
+			center.x = Double.valueOf(data[3]);
+			center.y = Double.valueOf(data[4]);
+			centerR = Double.valueOf(data[5]);
+			right.x = Double.valueOf(data[6]);
+			right.y = Double.valueOf(data[7]);
+			rightR = Double.valueOf(data[8]);
 			telemetry.addData("Data Loaded", raw);
 			
 		} catch(FileNotFoundException ex)

@@ -29,7 +29,7 @@ public abstract class Auto extends LinearOpMode {
 	
 	Robot robot;
 	
-	//!!! Vuforia Variables !!!
+	//--- Vuforia Computer Vision ---
 	
 	private VuforiaLocalizer vuforia;
 	private VuforiaLocalizer.Parameters parameters;
@@ -39,17 +39,18 @@ public abstract class Auto extends LinearOpMode {
 	private VuforiaTrackables roverRuckusTrackables;
 	private ArrayList<VuforiaTrackable> trackables;
 	
-	//-----------------------------
+	//-------------------------------
 	
 	final float MM_PER_INCH = 24.5f;
 	final float MM_FTC_FIELD_WIDTH = (12*12-2)* MM_PER_INCH;
 	
-	final float TARGET_ACCURACY = 15;
+	final float TARGET_ACCURACY = 70;
 	
 	Vector robotLocation = new Vector();
-	double robotRotation = 0;
 	
 	boolean hasSeenTarget = false;
+	
+	Vector[] recentData = new Vector[10];
 	
 	void initialize()
 	{
@@ -82,6 +83,10 @@ public abstract class Auto extends LinearOpMode {
 		
 		((VuforiaTrackableDefaultListener)trackables.get(0).getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
 		
+		for(int i = 0; i < recentData.length; i++)
+		{
+			recentData[i] = null;
+		}
 		
 		telemetry.addLine("Ready.");
 		
@@ -101,9 +106,10 @@ public abstract class Auto extends LinearOpMode {
 		{
 			
 			linearOp.telemetry.addLine("Driving forward.");
+			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
 			linearOp.telemetry.update();
 			
-			robot.runMotors(.5, -.5, -.5, .5);
+			robot.runMotors(.9, -.9, -.9, .9);
 			
 		}
 		
@@ -211,7 +217,13 @@ public abstract class Auto extends LinearOpMode {
 			Vector direction = Vector.sub(target, getRobotLocation());
 			telemetry.addData("Direction", direction.toString());
 			direction.normalize();
-			direction.div(3);
+			if(linearDistanceToTarget > 100) {
+				direction.div(3);
+			}
+			else
+			{
+				direction.div(5);
+			}
 			telemetry.addData("Direction (scaled)", direction.toString());
 			
 			telemetry.addLine();
@@ -220,13 +232,13 @@ public abstract class Auto extends LinearOpMode {
 			telemetry.addData("Calculated Direction", direction.toString());
 			telemetry.addData("Driver Direction", new Vector(gamepad1.left_stick_x, gamepad1.left_stick_y).toString());
 			
-			if(gamepad1.a) {
+			//if(gamepad1.a) {
 				robot.driverCentricDrive(-direction.x, direction.y, 0);
-			}
-			else
-			{
-				robot.driverCentricDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, 0);
-			}
+			//}
+			//else
+			//{
+				//robot.driverCentricDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, 0);
+			//}
 			
 			telemetry.addLine();
 			
@@ -302,7 +314,6 @@ public abstract class Auto extends LinearOpMode {
 			
 			if(!hasSeenTarget) {
 				Orientation orient = Orientation.getOrientation(robotLocationTransform, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-				//TODO: Update offset if necessary.
 				robot.offset = -90 + orient.thirdAngle;
 				hasSeenTarget = true;
 				telemetry.addData("Offset", robot.offset);
@@ -324,6 +335,100 @@ public abstract class Auto extends LinearOpMode {
 	
 	public Vector getRobotLocation() {
 		return robotLocation;
+	}
+	
+	/**
+	 * Dampens irregularities in the location data
+	 * by averaging the location of previous location
+	 * reads and throwing out irregular location values.
+	 * @return A "smoother" location value.
+	 */
+	private Vector dampenLocation()
+	{
+		
+		//Shift the data through the array.
+		for(int i = recentData.length-1; i >= 1; i++)
+		{
+			recentData[i] = recentData[i-1];
+		}
+		recentData[0] = robotLocation.copy();
+		
+		//Loop through the data and calculate the average.
+		Vector average = new Vector();
+		int amount = 0;
+		for(int i = 0; i < recentData.length; i++)
+		{
+			if(recentData[i] != null)
+			{
+				average.add(recentData[i]);
+				amount++;
+			}
+		}
+		
+		if(amount != 0)
+		{
+			average.div(amount);
+			return average;
+		}
+		else
+		{
+			return new Vector(0, 0);
+		}
+	
+	}
+	
+	/**
+	 * Drives the robot to a certain location on the field.
+	 * @param target The location to drive the robot to.
+	 */
+	void moveToPosition(Vector target, double rotationTarget)
+	{
+		
+		//Update the location of the robot before starting.
+		updateLocation();
+		//Calculate the linear distance to the target.
+		double linearDistanceToTarget = Vector.dist(target, getRobotLocation());
+		//Travel until within range of the target.
+		while(opModeIsActive() && linearDistanceToTarget > TARGET_ACCURACY)
+		{
+			
+			//Continuously update the position of the robot.
+			updateLocation();
+			
+			telemetry.addData("Target", target.toString());
+			telemetry.addData("Location", getRobotLocation().toString());
+			
+			//Continuously update the linear distance to the target.
+			linearDistanceToTarget = Vector.dist(target, getRobotLocation());
+			
+			telemetry.addData("Linear Distance to Target", linearDistanceToTarget);
+			
+			//Calculate the vector between the target and the location.
+			Vector direction = Vector.sub(target, getRobotLocation());
+			
+			telemetry.addData("Direction", direction.toString());
+			
+			//Scale down the vector to a magnitude usable by the robot.
+			direction.normalize();
+			direction.div(3);
+			
+			telemetry.addData("Direction (scaled)", direction.toString());
+			
+			double currentRotation = robot.getAbsoluteRobotRotation();
+			double ROTATION_TOLERANCE = 5;
+			
+			// TODO: 11/16/2018 May need to switch rotation direction signs.
+			//Drive the robot using field-centric mode.
+			robot.driverCentricDrive(-direction.x, direction.y, 0);
+					//(currentRotation > rotationTarget+ROTATION_TOLERANCE ? -.1 :
+					//		(currentRotation < rotationTarget-ROTATION_TOLERANCE ? .1 : 0)));
+			
+			telemetry.addLine();
+			
+		}
+		//Stop the robot.
+		robot.driverCentricDrive(0, 0, 0);
+		
 	}
 	
 	protected void runVision()

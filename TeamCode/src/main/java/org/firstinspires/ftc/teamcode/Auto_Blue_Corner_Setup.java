@@ -33,12 +33,13 @@ public class Auto_Blue_Corner_Setup extends Auto {
 		{
 			telemetry.addLine("Move to left position. Press A to continue.");
 			updateLocation();
-			telemetry.addData("Location", getRobotLocation());
+			telemetry.addData("Location", getRobotLocation().toString());
+			telemetry.addData("Rotation", robot.getAbsoluteRobotRotation());
 			telemetry.update();
 		}
 		
 		//Add the data to the data to write.
-		dataToWrite += getRobotLocation().x + "," + getRobotLocation().y + ",";
+		dataToWrite += getRobotLocation().x + "," + getRobotLocation().y + "," + robot.getAbsoluteRobotRotation() + ",";
 		
 		sleep(1000);
 		
@@ -47,12 +48,13 @@ public class Auto_Blue_Corner_Setup extends Auto {
 		{
 			telemetry.addLine("Move to center position. Press A to continue.");
 			updateLocation();
-			telemetry.addData("Location", getRobotLocation());
+			telemetry.addData("Location", getRobotLocation().toString());
+			telemetry.addData("Rotation", robot.getAbsoluteRobotRotation());
 			telemetry.update();
 		}
 		
 		//Add the data to the data to write.
-		dataToWrite += getRobotLocation().x + "," + getRobotLocation().y + ",";
+		dataToWrite += getRobotLocation().x + "," + getRobotLocation().y + "," + robot.getAbsoluteRobotRotation() + ",";
 		
 		sleep(1000);
 		
@@ -61,12 +63,13 @@ public class Auto_Blue_Corner_Setup extends Auto {
 		{
 			telemetry.addLine("Move to right position. Press A to continue.");
 			updateLocation();
-			telemetry.addData("Location", getRobotLocation());
+			telemetry.addData("Location", getRobotLocation().toString());
+			telemetry.addData("Rotation", robot.getAbsoluteRobotRotation());
 			telemetry.update();
 		}
 		
 		//Add the data to the data to write.
-		dataToWrite += getRobotLocation().x + "," + getRobotLocation().y;
+		dataToWrite += getRobotLocation().x + "," + getRobotLocation().y + "," + robot.getAbsoluteRobotRotation();
 		
 		sleep(1000);
 		

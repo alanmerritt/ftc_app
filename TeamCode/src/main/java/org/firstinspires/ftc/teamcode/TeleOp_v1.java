@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class TeleOp_v1 extends OpMode {
 	
 	private Robot robot;
-	private Servo s;
 	
 	private boolean driveButton = false;
 	private boolean driveButtonLast = false;
@@ -23,8 +22,6 @@ public class TeleOp_v1 extends OpMode {
 	public void init() {
 		
 		robot = new Robot(this);
-		
-		s = hardwareMap.servo.get("testServo");
 		
 	}
 	

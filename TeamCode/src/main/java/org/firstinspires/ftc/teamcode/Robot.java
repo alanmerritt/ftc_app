@@ -37,12 +37,15 @@ public class Robot {
 	public DistanceSensor distanceSensor;
 
 	public Servo markerDropper;
+	public final double MARKER_DROPPER_OPEN = 1;
+	public final double MARKER_DROPPER_CLOSED = .2;
+	public Servo phoneMount;
 	
 	private OpMode opmode;
 	
-	public double offset;
 	
-	public Servo phoneMount;
+	
+	public double offset;
 	
 	/**
 	 * Initializes the robot.
@@ -68,7 +71,7 @@ public class Robot {
 		
 		phoneMount = opmode.hardwareMap.servo.get("phoneMount");
 		
-		phoneMount.setPosition(180);
+		phoneMount.setPosition(.5);
 		
 	}
 	
@@ -182,6 +185,11 @@ public class Robot {
 		frontRight.setPower(fr);
 		backRight.setPower(br);
 		backLeft.setPower(bl);
+	}
+	
+	public double getAbsoluteRobotRotation()
+	{
+		return gyro.getYaw() - offset;
 	}
 	
 }
