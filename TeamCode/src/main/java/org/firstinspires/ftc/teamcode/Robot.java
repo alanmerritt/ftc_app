@@ -23,29 +23,29 @@ public class Robot {
 	final int WHEEL_DIAMETER = 4; //in.
 	final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; //in.
 	//Proportion to convert inches to encoder ticks.
-	public final int INCH = (int)(ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
+	final int INCH = (int)(ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
 	
-	public DcMotor frontLeft;
-	public DcMotor frontRight;
-	public DcMotor backRight;
-	public DcMotor backLeft;
+	//Drive motors.
+	DcMotor frontLeft;
+	DcMotor frontRight;
+	DcMotor backRight;
+	DcMotor backLeft;
 	
-	public Gyro gyro;
+	//Gyroscope
+	Gyro gyro;
 	
+	//Rev color/distance sensor. Although it is one sensor,
+	//it must be initialized as two in the code.
+	ColorSensor colorSensor;
+	DistanceSensor distanceSensor;
 	
-	public ColorSensor colorSensor;
-	public DistanceSensor distanceSensor;
-
-	public Servo markerDropper;
-	public final double MARKER_DROPPER_OPEN = 1;
-	public final double MARKER_DROPPER_CLOSED = .2;
-	public Servo phoneMount;
-	
+	//The OpMode that is running the robot.
 	private OpMode opmode;
 	
+	//Rotation offset for field-centric drive.
+	double offset;
 	
-	
-	public double offset;
+	DcMotor[] armMotors;
 	
 	/**
 	 * Initializes the robot.
@@ -65,13 +65,12 @@ public class Robot {
 		colorSensor = opmode.hardwareMap.get(ColorSensor.class, "color_distance_sensor");
 		distanceSensor = opmode.hardwareMap.get(DistanceSensor.class, "color_distance_sensor");
 		
-		markerDropper = opmode.hardwareMap.servo.get("markerDropper");
-		
 		offset = 0;
 		
-		phoneMount = opmode.hardwareMap.servo.get("phoneMount");
-		
-		phoneMount.setPosition(.5);
+		armMotors = new DcMotor[3];
+		armMotors[0] = opmode.hardwareMap.dcMotor.get("armMotor0");
+		armMotors[1] = opmode.hardwareMap.dcMotor.get("armMotor1");
+		armMotors[2] = opmode.hardwareMap.dcMotor.get("armMotor2");
 		
 	}
 	
@@ -104,21 +103,21 @@ public class Robot {
 	 */
 	public void driverCentricDrive(double x, double y, double r)
 	{
-	
-		Vector inputVector = new Vector(x, y);
-		opmode.telemetry.addData("Input vector", inputVector.toString());
-		Vector rotatedVector = rotateVector(inputVector, gyro.getYaw() - offset);
-		opmode.telemetry.addData("RotatedVector", rotatedVector.toString());
-		robotCentricDrive(rotatedVector.x, rotatedVector.y, r);
 		
-		opmode.telemetry.update();
+		//The direction to drive relative to the field.
+		Vector inputVector = new Vector(x, y);
+		//Rotate the vector by the rotation of the robot.
+		Vector rotatedVector = rotateVector(inputVector, gyro.getYaw() - offset);
+		//Run the robot-centric drive, but using the rotated vector. The rotation of the vector
+		//cancels off the rotation of the robot, and it "thinks" that it is moving at an angle.
+		robotCentricDrive(rotatedVector.x, rotatedVector.y, r);
 	
 	}
 	
 	/**
-	 * Rotates a vector by a specified rotation value.
+	 * Rotates a vector by a specified angle.
 	 * @param v The vector to rotate.
-	 * @param rotation The amount to rotate the vector.
+	 * @param rotation The amount to rotate the vector in degrees.
 	 * @return A new vector that has been rotated.
 	 */
 	private Vector rotateVector(Vector v, double rotation)
@@ -128,14 +127,8 @@ public class Robot {
 		double length = Math.sqrt(v.x*v.x + v.y*v.y);
 		double theta = Math.atan2(v.y, v.x);
 		
-		opmode.telemetry.addLine();
-		opmode.telemetry.addData("Length", length);
-		opmode.telemetry.addData("Theta", theta);
-		
 		//Add the rotation to the angle of the polar vector.
 		theta += rotation * Math.PI / 180.0;
-		
-		opmode.telemetry.addData("Rotated Theta", theta);
 		
 		//Create a new vector to return.
 		Vector rotated = new Vector();
@@ -185,6 +178,27 @@ public class Robot {
 		frontRight.setPower(fr);
 		backRight.setPower(br);
 		backLeft.setPower(bl);
+	}
+	
+	/**
+	 * Stops all drive motors.
+	 */
+	public void stopDrive()
+	{
+		runMotors(0, 0, 0, 0);
+	}
+	
+	public void runArm(double power)
+	{
+		for(DcMotor m : armMotors)
+		{
+			m.setPower(power);
+		}
+	}
+	
+	public void stopArm()
+	{
+		runArm(0);
 	}
 	
 	public double getAbsoluteRobotRotation()
