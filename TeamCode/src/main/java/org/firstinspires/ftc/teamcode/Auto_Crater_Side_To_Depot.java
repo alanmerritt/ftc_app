@@ -13,7 +13,7 @@ public class Auto_Crater_Side_To_Depot extends Auto {
 		
 		initialize();
 		
-		robot.markerDropper.setPosition(robot.MARKER_DROPPER_CLOSED);
+		//robot.markerDropper.setPosition(robot.MARKER_DROPPER_CLOSED);
 		
 		waitForStart();
 		
@@ -28,7 +28,7 @@ public class Auto_Crater_Side_To_Depot extends Auto {
 		
 		sleep(1000);
 		
-		robot.markerDropper.setPosition(robot.MARKER_DROPPER_CLOSED);
+		//robot.markerDropper.setPosition(robot.MARKER_DROPPER_CLOSED);
 		
 		sleep(1000);
 		

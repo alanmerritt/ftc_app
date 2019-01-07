@@ -13,14 +13,14 @@ public class Auto_Blue_Corner_Drop extends Auto {
 		
 		initialize();
 		
-		robot.markerDropper.setPosition(robot.MARKER_DROPPER_CLOSED);
+		//robot.markerDropper.setPosition(robot.MARKER_DROPPER_CLOSED);
 		
 		waitForStart();
 		
 		driveForward(-67, this);
 		robot.runMotors(0, 0, 0, 0);
 		
-		robot.markerDropper.setPosition(robot.MARKER_DROPPER_OPEN);
+		//robot.markerDropper.setPosition(robot.MARKER_DROPPER_OPEN);
 		sleep(1000);
 		
 		while(robot.gyro.getYaw() > -40 && opModeIsActive())

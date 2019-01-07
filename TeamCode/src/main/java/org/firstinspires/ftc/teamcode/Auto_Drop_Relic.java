@@ -15,7 +15,7 @@ public class Auto_Drop_Relic extends Auto {
 		double markerDropperOpen = 1;
 		double markerDropperClosed = .5;
 		
-		robot.markerDropper.setPosition(markerDropperClosed);
+		//robot.markerDropper.setPosition(markerDropperClosed);
 		
 		waitForStart();
 		
@@ -23,7 +23,7 @@ public class Auto_Drop_Relic extends Auto {
 		
 		sleep(1000);
 		
-		robot.markerDropper.setPosition(markerDropperOpen);
+		//robot.markerDropper.setPosition(markerDropperOpen);
 		
 		sleep(1000);
 		
