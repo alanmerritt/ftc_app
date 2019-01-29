@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -26,13 +28,13 @@ public class Robot {
 	final int INCH = (int)(ENCODER_TICKS_PER_REVOLUTION / WHEEL_CIRCUMFERENCE);
 	
 	//Drive motors.
-	DcMotor frontLeft;
-	DcMotor frontRight;
-	DcMotor backRight;
-	DcMotor backLeft;
+	public DcMotor frontLeft;
+	public DcMotor frontRight;
+	public DcMotor backRight;
+	public DcMotor backLeft;
 	
 	//Gyroscope
-	Gyro gyro;
+	public Gyro gyro;
 	
 	//Rev color/distance sensor. Although it is one sensor,
 	//it must be initialized as two in the code.
@@ -47,6 +49,9 @@ public class Robot {
 	
 	DcMotor[] armMotors;
 	
+	CRServo collectorServo;
+	Servo teamMarkerServo;
+	
 	/**
 	 * Initializes the robot.
 	 * @param _opmode The opMode that the robot is being controlled by.
@@ -60,6 +65,11 @@ public class Robot {
 		backRight = opmode.hardwareMap.dcMotor.get("br");
 		backLeft = opmode.hardwareMap.dcMotor.get("bl");
 		
+		frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+		frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+		backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+		backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+		
 		gyro = new Gyro(opmode);
 		
 		colorSensor = opmode.hardwareMap.get(ColorSensor.class, "color_distance_sensor");
@@ -71,6 +81,9 @@ public class Robot {
 		armMotors[0] = opmode.hardwareMap.dcMotor.get("armMotor0");
 		armMotors[1] = opmode.hardwareMap.dcMotor.get("armMotor1");
 		armMotors[2] = opmode.hardwareMap.dcMotor.get("armMotor2");
+		
+		collectorServo = opmode.hardwareMap.crservo.get("collectorServo");
+		teamMarkerServo = opmode.hardwareMap.servo.get("teamMarkerServo");
 		
 	}
 	
@@ -110,7 +123,7 @@ public class Robot {
 		Vector rotatedVector = rotateVector(inputVector, gyro.getYaw() - offset);
 		//Run the robot-centric drive, but using the rotated vector. The rotation of the vector
 		//cancels off the rotation of the robot, and it "thinks" that it is moving at an angle.
-		robotCentricDrive(rotatedVector.x, rotatedVector.y, r);
+		robotCentricDrive(rotatedVector.x, rotatedVector.y, -r);
 	
 	}
 	
@@ -158,11 +171,20 @@ public class Robot {
 	 * Sets the encoder targets of all the motors.
 	 * @param target The encoder target.
 	 */
+	@Deprecated
 	public void setTargets(int target) {
 		frontLeft.setTargetPosition(target);
 		frontRight.setTargetPosition(-target);
 		backRight.setTargetPosition(-target);
 		backLeft.setTargetPosition(target);
+	}
+	
+	public void setTargets(int fl, int fr, int br, int bl)
+	{
+		frontLeft.setTargetPosition(fl);
+		frontRight.setTargetPosition(-fr);
+		backRight.setTargetPosition(-br);
+		backLeft.setTargetPosition(bl);
 	}
 	
 	/**
@@ -205,5 +227,24 @@ public class Robot {
 	{
 		return gyro.getYaw() - offset;
 	}
+	
+	public void collectorForward()
+	{
+		collectorServo.setPower(-1);
+	}
+	
+	public void collectorReverse()
+	{
+		collectorServo.setPower(1);
+	}
+	
+	public void collectorStop()
+	{
+		collectorServo.setPower(0);
+	}
+	
+	public void markerDropperretract() {teamMarkerServo.setPosition(1); }
+	
+	public void markerDropperdeposit() {teamMarkerServo.setPosition(0);}
 	
 }

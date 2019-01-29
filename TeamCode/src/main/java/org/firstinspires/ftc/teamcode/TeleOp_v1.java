@@ -35,7 +35,7 @@ public class TeleOp_v1 extends OpMode {
 	
 	@Override
 	public void loop() {
-
+		
 		double x = gamepad1.left_stick_x;
 		double y = gamepad1.left_stick_y;
 		double r = gamepad1.right_stick_x;
@@ -74,12 +74,16 @@ public class TeleOp_v1 extends OpMode {
 		extendanator.setPower(gamepad2.right_stick_y);
 		
 		if(gamepad2.a==true) {
-			collectorServo.setPower(-1);
+			robot.collectorForward();
 		} else if(gamepad2.b==true){
-			collectorServo.setPower(1);
+			robot.collectorReverse();
 		}else{
-			collectorServo.setPower(0);
+			robot.collectorStop();
 		}
+		
+		telemetry.addData("Gyro Z (first)", robot.gyro.getOrientation().firstAngle);
+		telemetry.addData("Gyro Y (second)", robot.gyro.getOrientation().secondAngle);
+		telemetry.addData("Gyro X (third)", robot.gyro.getOrientation().thirdAngle);
 		
 		telemetry.update();
 		

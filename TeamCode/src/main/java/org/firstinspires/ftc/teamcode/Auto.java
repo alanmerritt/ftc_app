@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 public abstract class Auto extends LinearOpMode {
 	
-	Robot robot;
+	protected Robot robot;
 	
 	//--- Vuforia Computer Vision ---
 	
@@ -41,6 +41,8 @@ public abstract class Auto extends LinearOpMode {
 	
 	//-------------------------------
 	
+	//--- Vuforia Location Variables ---
+	
 	final float MM_PER_INCH = 24.5f;
 	final float MM_FTC_FIELD_WIDTH = (12*12-2)* MM_PER_INCH;
 	
@@ -52,10 +54,18 @@ public abstract class Auto extends LinearOpMode {
 	
 	Vector[] recentData = new Vector[10];
 	
-	void initialize()
+	//----------------------------------
+	
+	public void initialize()
 	{
+		
+		//Initialize the robot.
 		robot = new Robot(this);
 		
+		//Retract the marker dropper.
+		robot.markerDropperretract();
+		
+		//--- Prepare the Vuforia. ---
 		initializeVuforia();
 		
 		OpenGLMatrix bluePerimiterLocationOnField = OpenGLMatrix
@@ -88,18 +98,24 @@ public abstract class Auto extends LinearOpMode {
 			recentData[i] = null;
 		}
 		
+		//----------------------------
+		
 		telemetry.addLine("Ready.");
+		telemetry.update();
 		
 	}
 	
+	@Deprecated
 	public void driveForward(double distance, LinearOpMode linearOp)
 	{
-		
+		//Reset the motor encoders.
 		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		robot.setModes(DcMotor.RunMode.RUN_TO_POSITION);
 		
+		//Set the targets.
 		robot.setTargets((int) distance * robot.INCH);
 		
+		//While none of the robots have reached the target.
 		while(!linearOp.isStopRequested() &&
 				(robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
 						robot.backRight.isBusy() && robot.backLeft.isBusy()))
@@ -109,17 +125,240 @@ public abstract class Auto extends LinearOpMode {
 			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
 			linearOp.telemetry.update();
 			
+			//Drive the robot forward.
 			robot.runMotors(.9, -.9, -.9, .9);
 			
 		}
 		
+		//Stop the motors and reset the encoders.
 		robot.runMotors(0, 0, 0, 0);
 		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		
 	}
 	
-	protected boolean isYellow()
+	public void driveForward(double distance, double power, LinearOpMode linearOp)
+	{
+		
+		//Reset the motor encoders.
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		
+		//Set the targets.
+		robot.setTargets((int) distance * robot.INCH);
+		
+		//While none of the robots have reached the target.
+		while(!linearOp.isStopRequested() &&
+				(robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
+						robot.backRight.isBusy() && robot.backLeft.isBusy()))
+		{
+			
+			linearOp.telemetry.addLine("Driving forward.");
+			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.update();
+			
+			//Drive the robot forward.
+			robot.runMotors(power, -power, -power, power);
+			
+		}
+		
+		//Stop the motors and reset the encoders.
+		robot.runMotors(0, 0, 0, 0);
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		
+	}
+	
+	public void driveForwardUntilConditionMet(double distance, double power, LinearOpMode linearOp, boolean condition)
+	{
+		
+		//Reset the motor encoders.
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		
+		//Set the targets.
+		robot.setTargets((int) distance * robot.INCH);
+		
+		//While none of the robots have reached the target.
+		while(!linearOp.isStopRequested() &&
+				(robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
+						robot.backRight.isBusy() && robot.backLeft.isBusy()))
+		{
+			
+			linearOp.telemetry.addLine("Driving forward.");
+			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.update();
+			
+			//Drive the robot forward.
+			robot.runMotors(power, -power, -power, power);
+			
+		}
+		
+		//Stop the motors and reset the encoders.
+		robot.runMotors(0, 0, 0, 0);
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		
+	}
+	
+	public void driveBackward(double distance, double power, LinearOpMode linearOp)
+	{
+		
+		//Reset the motor encoders.
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		
+		//Set the targets.
+		robot.setTargets((int) -distance * robot.INCH);
+		
+		//While none of the robots have reached the target.
+		while(!linearOp.isStopRequested() &&
+				(robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
+						robot.backRight.isBusy() && robot.backLeft.isBusy()))
+		{
+			
+			linearOp.telemetry.addLine("Driving backward.");
+			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.update();
+			
+			//Drive the robot backward.
+			robot.runMotors(-power, power, power, -power);
+			
+		}
+		
+		
+		
+		//Stop the motors and reset the encoders.
+		robot.runMotors(0, 0, 0, 0);
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		
+	}
+	
+	public void driveLeft(double distance, double power, LinearOpMode linearOp)
+	{
+		
+		//Reset the motor encoders.
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		
+		//Set the targets.
+		int target = (int)(distance*robot.INCH);
+		robot.setTargets(-target, target, -target, target);
+		
+		//While none of the robots have reached the target.
+		while(!linearOp.isStopRequested() &&
+				(robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
+						robot.backRight.isBusy() && robot.backLeft.isBusy()))
+		{
+			
+			linearOp.telemetry.addLine("Driving left.");
+			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.update();
+			
+			//Drive the robot backward.
+			robot.runMotors(power, power, power, power);
+			
+		}
+		
+		
+		
+		//Stop the motors and reset the encoders.
+		robot.runMotors(0, 0, 0, 0);
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		
+	}
+	
+	public void driveRight(double distance, double power, LinearOpMode linearOp)
+	{
+		
+		//Reset the motor encoders.
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_TO_POSITION);
+		
+		//Set the targets.
+		int target = (int)(distance*robot.INCH);
+		robot.setTargets(target, -target, target, -target);
+		
+		//While none of the robots have reached the target.
+		while(!linearOp.isStopRequested() &&
+				(robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
+						robot.backRight.isBusy() && robot.backLeft.isBusy()))
+		{
+			
+			linearOp.telemetry.addLine("Driving right.");
+			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.update();
+			
+			//Drive the robot backward.
+			robot.runMotors(-power, -power, power, power);
+			
+		}
+		
+		
+		
+		//Stop the motors and reset the encoders.
+		robot.runMotors(0, 0, 0, 0);
+		robot.setModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+		
+	}
+	
+	public void rotateCCW(double degrees, double power)
+	{
+		
+		//Get the absolute value of the inputs to
+		//make sure no one does anything funny.
+		double deg = Math.abs(degrees);
+		double pow = Math.abs(power);
+		
+		//Drive the robot while the correct yaw value is not reached.
+		while(robot.gyro.getYaw() > -deg && opModeIsActive())
+		{
+			robot.runMotors(pow, pow, pow, pow);
+		}
+		
+		robot.stopDrive();
+		
+	}
+	
+	public void rotateCW(double degrees, double power)
+	{
+		
+		//Get the absolute value of the inputs to
+		//make sure no one does anything funny.
+		double deg = Math.abs(degrees);
+		double pow = Math.abs(power);
+		
+		//Drive the robot while the correct yaw value is not reached.
+		while(robot.gyro.getYaw() < deg && opModeIsActive())
+		{
+			robot.runMotors(-pow, -pow, -pow, -pow);
+		}
+		
+		robot.stopDrive();
+		
+	}
+	
+	public void lowerBot()
+	{
+		
+		while(!isStopRequested() && robot.gyro.getOrientation().secondAngle < 0)
+		{
+			robot.runArm(-.5);
+			telemetry.addData("Angle", robot.gyro.getOrientation().secondAngle);
+			telemetry.update();
+		}
+		
+//		robot.runArm(-.5);
+//		sleep(1250);
+		
+		robot.stopArm();
+		
+	}
+	
+	public boolean isYellow()
 	{
 		
 		double r = robot.colorSensor.red();
@@ -137,13 +376,10 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
-	
-	
-	
 	/**
 	 * Begins tracking the vision targets.
 	 */
-	void beginTracking()
+	public void beginTracking()
 	{
 		roverRuckusTrackables.activate();
 	}
@@ -460,5 +696,7 @@ public abstract class Auto extends LinearOpMode {
 		}
 	
 	}
+	
+	
 	
 }
