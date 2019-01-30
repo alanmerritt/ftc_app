@@ -137,6 +137,12 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	/**
+	 * Drives the robot forward.
+	 * @param distance The distance to travel.
+	 * @param power The motor power.
+	 * @param linearOp The OpMode that is running the robot (use this).
+	 */
 	public void driveForward(double distance, double power, LinearOpMode linearOp)
 	{
 		
@@ -168,6 +174,7 @@ public abstract class Auto extends LinearOpMode {
 		robot.setModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 		
 	}
+	
 	
 	public void driveForwardUntilConditionMet(double distance, double power, LinearOpMode linearOp, boolean condition)
 	{
@@ -201,6 +208,12 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	/**
+	 * Drives the robot backward.
+	 * @param distance The distance to travel.
+	 * @param power The motor power.
+	 * @param linearOp The OpMode that is running the robot (use this).
+	 */
 	public void driveBackward(double distance, double power, LinearOpMode linearOp)
 	{
 		
@@ -235,6 +248,12 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	/**
+	 * Drives the robot left.
+	 * @param distance The distance to travel.
+	 * @param power The motor power.
+	 * @param linearOp The OpMode that is running the robot (use this).
+	 */
 	public void driveLeft(double distance, double power, LinearOpMode linearOp)
 	{
 		
@@ -270,6 +289,12 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+	/**
+	 * Drives the robot right.
+	 * @param distance The distance to travel.
+	 * @param power The motor power.
+	 * @param linearOp The OpMode that is running the robot (use this).
+	 */
 	public void driveRight(double distance, double power, LinearOpMode linearOp)
 	{
 		
