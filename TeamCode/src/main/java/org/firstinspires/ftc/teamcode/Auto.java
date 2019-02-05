@@ -330,7 +330,7 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
-	public void rotateCCW(double degrees, double power)
+	public void rotateCW(double degrees, double power)
 	{
 		
 		//Get the absolute value of the inputs to
@@ -348,7 +348,7 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
-	public void rotateCW(double degrees, double power)
+	public void rotateCCW(double degrees, double power)
 	{
 		
 		//Get the absolute value of the inputs to

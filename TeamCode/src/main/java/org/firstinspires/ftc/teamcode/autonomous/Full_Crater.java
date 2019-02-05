@@ -18,68 +18,117 @@ public class Full_Crater extends Auto {
 	
 	lowerBot();
 	
-	sleep(2000);
+	sleep(200);
 	
 	driveLeft(6,1,this);
 	
-	sleep(2000);
+	sleep(200);
 	
 	driveForward(3,1,this);
 	
-	sleep(2000);
+	sleep(200);
 	
 	driveRight(5,1,this);
 	
-	sleep(2000);
+	sleep(200);
 	
-	knockoffcenter();
+	robot.markerDropperretract();
 	
-	    driveBackward(25,1,this);
+			//knockoffcenter();
 		
-		sleep(2000);
+		knockoffright();
 		
-		driveLeft(45,1,this);
+		sleep(200);
 		
-		sleep(2000);
+		rotateCCW(45,1);
 		
-		rotateCCW(90,1);
+		sleep(200);
 		
-		sleep(2000);
+		driveForward(25,1,this);
 		
-		knockoffcenter();
+		sleep(200);
 		
-		driveForward(13,1,this);
+		rotateCCW(100,1);
+		
+		sleep(200);
+		
+		driveRight(23,.4,this);
+		
+		sleep(200);
+		
+		driveLeft(8,1,this);
+		
+		sleep(200);
+		
+		driveForward(55,1,this);
+		
+		sleep(200);
 		
 		robot.markerDropperdeposit();
 		
-		sleep(2000);
+		driveForward(5,1,this);
 		
-		rotateCW(25,.5);
+		sleep(100);
 		
-		sleep(2000);
+		driveBackward(5,1,this);
 		
-		driveForward(20,1,this);
+		sleep(100);
 		
+		driveForward(5,1,this);
 		
+		sleep(100);
 		
+		driveBackward(5,1,this);
 		
+		sleep(100);
 		
+		driveBackward(30,1,this);
 		
+		sleep(200);
 		
-		robot.markerDropperdeposit();
+		driveRight(4,1,this);
 		
+		sleep(200);
 		
+		driveBackward(20,1,this);
+		
+		sleep(200);
+		
+		driveBackward(12,.4,this);
 	}
 	
 	void knockoffcenter(){
 	
-	driveForward(20,.5,this);
+	driveForward(25,.5,this);
 		
 		sleep(200);
 		
-	driveBackward(20,.5,this);
+	driveBackward(15,.5,this);
 	
 	
+	
+	}
+	
+	void knockoffright()
+	{
+	    
+	    driveForward(5,1,this);
+		
+	    sleep(200);
+	    
+		driveRight(15,1,this);
+	    
+	    sleep(200);
+	    
+	    driveForward(15,.5,this);
+	    
+	    sleep(200);
+	    
+	    driveBackward(15,.5,this);
+	    
+	    sleep(200);
+	    
+	    driveLeft(15,1,this);
 	
 	}
 	
