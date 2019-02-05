@@ -67,7 +67,12 @@ public class TFTest extends LinearOpMode {
 	 * Once you've obtained a license key, copy the string from the Vuforia web site
 	 * and paste it in to your code on the next line, between the double quotes.
 	 */
-	private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+	private static final String VUFORIA_KEY = "ARS60u//////AAAAGatg5bzrIElJruCZEPDqKr8mksRb99R0GE" +
+			"dJMfM4xVotZyXhiShn+ToKcAK2foRmNGNekn6uvxjmkdjbOlFvoQhDYJVBYvFF3afgz8aWcqo" +
+			"+WkdT3pXqnEcrPtMd4bz/CuC65ajgco231Ca7iUjqk7tuzv5Zg5gUpAfE2FulF0GIq6sXboe5" +
+			"OqrDxCLG+tA6oF24zuzFCEGZHUs8PDL3NwoA2KKbZttdoE13Kvqq9+AgBrqWeIYwefx9nkzWm" +
+			"n81QXHFd68APHaKyKT1PNxWKEK9aDL5vp4LRiG17AaBaGpXedpKVN4/o6GAWJm2zCOLwOb1aS" +
+			"MP8u7hDTXxsax0iMyEFYpzhshDar3HwD4xNy28";
 	
 	/**
 	 * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -99,6 +104,8 @@ public class TFTest extends LinearOpMode {
 		waitForStart();
 		
 		if (opModeIsActive()) {
+			
+			
 			/** Activate Tensor Flow Object Detection. */
 			if (tfod != null) {
 				tfod.activate();
@@ -111,19 +118,29 @@ public class TFTest extends LinearOpMode {
 					List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 					if (updatedRecognitions != null) {
 						telemetry.addData("# Object Detected", updatedRecognitions.size());
+						
+						//If there are three minerals...
 						if (updatedRecognitions.size() == 3) {
+							
+							//The positions of each of the elements.
 							int goldMineralX = -1;
 							int silverMineral1X = -1;
 							int silverMineral2X = -1;
+							
+							//Loop through each of the elements.
 							for (Recognition recognition : updatedRecognitions) {
+								//If the element detected is the gold one, set the gold position.
 								if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
 									goldMineralX = (int) recognition.getLeft();
-								} else if (silverMineral1X == -1) {
+								} else if (silverMineral1X == -1) { //Otherwise, if the first silver
+									//element has not been detected yet, set its position.
 									silverMineral1X = (int) recognition.getLeft();
-								} else {
+								} else { //Otherwise, set the position of the last silver element.
 									silverMineral2X = (int) recognition.getLeft();
 								}
 							}
+							
+							//Compare the positions of the elements.
 							if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
 								if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
 									telemetry.addData("Gold Mineral Position", "Left");
@@ -140,6 +157,7 @@ public class TFTest extends LinearOpMode {
 			}
 		}
 		
+		//Deactivate TensorFlow when done with it.
 		if (tfod != null) {
 			tfod.shutdown();
 		}
@@ -170,6 +188,10 @@ public class TFTest extends LinearOpMode {
 		int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
 				"tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 		TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+		
+		//Minimum confidence level.
+		tfodParameters.minimumConfidence = .40;
+		
 		tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 		tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
 	}
