@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 
@@ -17,14 +18,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by MerrittAM on 11/9/2018.
  * Autonomous program base class.
  */
-
 public abstract class Auto extends LinearOpMode {
 	
 	protected Robot robot;
@@ -41,8 +44,16 @@ public abstract class Auto extends LinearOpMode {
 	
 	//-------------------------------
 	
-	//--- Vuforia Location Variables ---
+	//--- Tensorflow Computer Vision ---
+	private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+	private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+	private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 	
+	private TFObjectDetector tfod;
+	
+	//----------------------------------
+	
+	//--- Vuforia Location Variables ---
 	final float MM_PER_INCH = 24.5f;
 	final float MM_FTC_FIELD_WIDTH = (12*12-2)* MM_PER_INCH;
 	
@@ -56,6 +67,14 @@ public abstract class Auto extends LinearOpMode {
 	
 	//----------------------------------
 	
+	protected enum ElementPosition
+	{
+		LEFT,
+		CENTER,
+		RIGHT,
+		UNKNOWN
+	}
+	
 	public void initialize()
 	{
 		
@@ -67,6 +86,16 @@ public abstract class Auto extends LinearOpMode {
 		
 		//--- Prepare the Vuforia. ---
 		initializeVuforia();
+		
+		//--- Prepare the TensorFlow. ---
+		if(ClassFactory.getInstance().canCreateTFObjectDetector())
+		{
+			initializeTensorFlow();
+		}
+		else
+		{
+			telemetry.addLine("TensorFlow unable to be instantiated.");
+		}
 		
 		OpenGLMatrix bluePerimiterLocationOnField = OpenGLMatrix
 				.translation(0, MM_FTC_FIELD_WIDTH/2, 0)
@@ -517,7 +546,7 @@ public abstract class Auto extends LinearOpMode {
 		
 		//Tells the robot controller to show what it sees in the camera on the screen.
 		cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-		parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+		parameters = new VuforiaLocalizer.Parameters();//(cameraMonitorViewId);
 		//Set the license key.
 		parameters.vuforiaLicenseKey = "ARS60u//////AAAAGatg5bzrIElJruCZEPDqKr8mksRb99R0GE" +
 				"dJMfM4xVotZyXhiShn+ToKcAK2foRmNGNekn6uvxjmkdjbOlFvoQhDYJVBYvFF3afgz8aWcqo" +
@@ -560,6 +589,23 @@ public abstract class Auto extends LinearOpMode {
 		backPerimiter.setName("BackPerimiter");
 		trackables.add(backPerimiter);
 		//---------------------------------------------
+		
+	}
+	
+	private void initializeTensorFlow()
+	{
+		//Shows the camera view on the screen.
+		int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+		//Set the camera view.
+		TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+		
+		//Minimum confidence level.
+		tfodParameters.minimumConfidence = .4;
+		
+		//Create an instance of the tensorflow object detector.
+		tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+		//Load the models.
+		tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
 		
 	}
 	
@@ -722,6 +768,158 @@ public abstract class Auto extends LinearOpMode {
 	
 	}
 	
+	protected void activateElementDetection()
+	{
+		if(tfod != null)
+		{
+			tfod.activate();
+			telemetry.addLine("Element detection activated.");
+			telemetry.update();
+		}
+		else
+		{
+			telemetry.addLine("!!!Warning! Element detection not activated.!!!");
+			telemetry.update();
+		}
+	}
 	
+	protected ElementPosition detectElement()
+	{
+		
+		//A timer to end the object detection if it has not returned after a certain time.
+		ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+		time.reset();
+		
+		//The amount of time allotted for the computer vision to run its course.
+		final int TIMEOUT = 5000;
+		
+		//While stop has not been pressed and the timer has not exceeded the limit.
+		while(!isStopRequested() && time.time() < TIMEOUT) {
+			
+			if (tfod != null) {
+				
+				//Get a list of all the recognized objects.
+				List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+				if (updatedRecognitions != null) {
+					
+					telemetry.addData("# of objects detected", updatedRecognitions.size());
+					
+					//If three or more objects are detected.
+					if (updatedRecognitions.size() >= 3) {
+						
+						final int ERROR_FLAG = -1;
+						
+						//Initialize the positions to error flags. If the values of the vectors
+						//are still equal to the error flags at the end, we know that something
+						//went wrong or the correct information was not available.
+						Vector lowestGoldPos = new Vector(ERROR_FLAG, ERROR_FLAG);
+						Vector lowestSilverPos = new Vector(ERROR_FLAG, ERROR_FLAG);
+						Vector secondLowestSilverPos = new Vector(ERROR_FLAG, ERROR_FLAG);
+						
+						//Loop through all the recognized objects.
+						for (Recognition recognition : updatedRecognitions) {
+							
+							//If it is a gold element, check if it is the lowest.
+							if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+								//If there is a gold object lower on the screen
+								//(higher y value), set its position as the lowest so far.
+								if (lowerThan(recognition, lowestGoldPos)) {
+									lowestGoldPos.x = recognition.getLeft();
+									lowestGoldPos.y = recognition.getTop();
+								}
+							} else {
+								//Check if it is lower than the lowest so far.
+								if (lowerThan(recognition, lowestSilverPos)) {
+									//The current lowest silver is now the second lowest.
+									secondLowestSilverPos = lowestSilverPos.copy();
+									
+									//Update the lowest position.
+									lowestSilverPos.x = recognition.getLeft();
+									lowestSilverPos.y = recognition.getTop();
+									
+								} //Check if it is higher than the lowest, but lower than the second.
+								else if (lowerThan(recognition, secondLowestSilverPos)) {
+									secondLowestSilverPos.x = recognition.getLeft();
+									secondLowestSilverPos.y = recognition.getTop();
+								}
+								
+							}
+							
+							//If the values have not changed, then there was not enough information.
+							//If they have changed, then we can determine the positions.
+							if (lowestGoldPos.x != ERROR_FLAG &&
+									lowestSilverPos.x != ERROR_FLAG &&
+									secondLowestSilverPos.x != ERROR_FLAG) {
+								
+								//If the x position of the gold is less than the x positions of both
+								//silvers, then the gold element is on the left.
+								if (lowestGoldPos.x < lowestSilverPos.x && lowestGoldPos.x < secondLowestSilverPos.x)
+								{
+									//Gold element is in LEFT position.
+									return ElementPosition.LEFT;
+								} //If the x position of the gold is greater than the x positions of
+								//both silvers, then the gold element is on the right.
+								else if (lowestGoldPos.x > lowestSilverPos.x && lowestGoldPos.x > secondLowestSilverPos.x)
+								{
+									//Gold element is in RIGHT position.
+									return ElementPosition.RIGHT;
+								} //If the x position of the gold is not greater than both or less
+								//than both, then the gold element is in the middle.
+								else
+								{
+									//Gold element is in CENTER position.
+									return ElementPosition.RIGHT;
+								}
+								
+								
+							}
+							
+						}
+						
+						
+					} else {
+						telemetry.addLine("Not enough objects detected.");
+					}
+					
+				}
+				
+			} else {
+				telemetry.addLine("!!!Warning! Problem with TensorFlow.!!!");
+			}
+			
+			telemetry.update();
+			
+		}
+		
+		return ElementPosition.UNKNOWN;
+		
+	}
+	
+	private boolean lowerThan(Recognition recognition, Vector check)
+	{
+		if(recognition.getTop() > check.y)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	protected void deactivateElementDetection()
+	{
+		if(tfod != null)
+		{
+			tfod.shutdown();
+			telemetry.addLine("Element detection deactivated.");
+			telemetry.update();
+		}
+		else
+		{
+			telemetry.addLine("!!!Warning! Element detection not deactivated.!!!");
+			telemetry.update();
+		}
+	}
 	
 }

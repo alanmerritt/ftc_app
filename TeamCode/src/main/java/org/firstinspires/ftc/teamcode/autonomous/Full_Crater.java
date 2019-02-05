@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.Auto;
 @Autonomous(name = "Full Crater",group = "Autonomous")
 public class Full_Crater extends Auto {
 	
+	//TODO: !!!Tristin!!! Put some comments in the code!!!!!!
+	
 	public void runOpMode() {
 	
 	initialize();
@@ -34,9 +36,35 @@ public class Full_Crater extends Auto {
 	
 	robot.markerDropperretract();
 	
+	//Start detecting the elements.
+	activateElementDetection();
+	
+	//Detect the elements. Save the position (LEFT, CENTER,
+	//RIGHT, or UNKNOWN) into the position variable.
+	ElementPosition position = detectElement();
+	
+	//Deactivate element detection.
+	deactivateElementDetection();
+	
+	//If the position is LEFT, run the knockOffLeft method.
+	if(position == ElementPosition.LEFT)
+	{
+		//TODO: Add knockOffLeft() method.
+		
+	} //If the position is RIGHT, run the knockOffRight method.
+	else if(position == ElementPosition.RIGHT)
+	{
+		knockOffRight();
+	} //If the position is CENTER, run the knockOffCenter method.
+	//If the position could not be determined, run the knockOffCenter method as a default.
+	else if(position == ElementPosition.CENTER || position == ElementPosition.UNKNOWN)
+	{
+		knockOffCenter();
+	}
+	
 			//knockoffcenter();
 		
-		knockoffright();
+//		knockoffright();
 		
 		sleep(200);
 		
@@ -97,7 +125,7 @@ public class Full_Crater extends Auto {
 		driveBackward(12,.4,this);
 	}
 	
-	void knockoffcenter(){
+	void knockOffCenter(){
 	
 	driveForward(25,.5,this);
 		
@@ -109,7 +137,7 @@ public class Full_Crater extends Auto {
 	
 	}
 	
-	void knockoffright()
+	void knockOffRight()
 	{
 	    
 	    driveForward(5,1,this);
