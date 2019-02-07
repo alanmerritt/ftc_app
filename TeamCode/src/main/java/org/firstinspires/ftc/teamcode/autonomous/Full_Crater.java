@@ -57,9 +57,18 @@ public class Full_Crater extends Auto {
 		knockOffRight();
 	} //If the position is CENTER, run the knockOffCenter method.
 	//If the position could not be determined, run the knockOffCenter method as a default.
-	else if(position == ElementPosition.CENTER || position == ElementPosition.UNKNOWN)
+	else if(position == ElementPosition.CENTER)
 	{
 		knockOffCenter();
+	}
+	else
+	{
+
+		telemetry.addLine("!!!Warning! Position could not be determined.!!!");
+		telemetry.update();
+
+		knockOffCenter();
+
 	}
 	
 			//knockoffcenter();
