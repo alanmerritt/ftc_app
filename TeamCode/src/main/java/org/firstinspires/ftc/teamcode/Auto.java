@@ -868,7 +868,7 @@ public abstract class Auto extends LinearOpMode {
 								else
 								{
 									//Gold element is in CENTER position.
-									return ElementPosition.RIGHT;
+									return ElementPosition.CENTER;
 								}
 								
 								
