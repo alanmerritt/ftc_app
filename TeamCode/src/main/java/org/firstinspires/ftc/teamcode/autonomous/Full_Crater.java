@@ -10,33 +10,27 @@ import org.firstinspires.ftc.teamcode.Auto;
 @Autonomous(name = "Full Crater",group = "Autonomous")
 public class Full_Crater extends Auto {
 	
-	//TODO: !!!Tristin!!! Put some comments in the code!!!!!!
-	
 	public void runOpMode() {
 	
 	initialize();
 	
 	waitForStart();
 	
+	//rest of this line is for unhooking
 	lowerBot();
-	
-	sleep(200);
+	   sleep(200);
 	
 	driveLeft(6,1,this);
-	
-	sleep(200);
+	   sleep(200);
 	
 	driveForward(3,1,this);
-	
-	sleep(200);
+	   sleep(200);
 	
 	driveRight(5,1,this);
-	
-	sleep(200);
+	   sleep(200);
 	
 	robot.markerDropperretract();
-	
-	//Start detecting the elements.
+		//Start detecting the elements.
 	activateElementDetection();
 	
 	//Detect the elements. Save the position (LEFT, CENTER,
@@ -49,7 +43,7 @@ public class Full_Crater extends Auto {
 	//If the position is LEFT, run the knockOffLeft method.
 	if(position == ElementPosition.LEFT)
 	{
-		//TODO: Add knockOffLeft() method.
+		knockOffLeft();
 		
 	} //If the position is RIGHT, run the knockOffRight method.
 	else if(position == ElementPosition.RIGHT)
@@ -70,105 +64,125 @@ public class Full_Crater extends Auto {
 		knockOffCenter();
 
 	}
-	
+	   //all of the methods end at the same spot to run the same line
 			//knockoffcenter();
 		
 //		knockoffright();
 		
-		sleep(200);
+		   sleep(200);
 		
 		rotateCCW(45,1);
+		   sleep(200);
 		
-		sleep(200);
-		
+		driveLeft(3,1,this);
+		   sleep(200);
+
 		driveForward(25,1,this);
-		
-		sleep(200);
+		   sleep(200);
 		
 		rotateCCW(100,1);
+		   sleep(200);
 		
-		sleep(200);
-		
-		driveRight(23,.4,this);
-		
-		sleep(200);
+		driveRight(35,.7,this);
+		//robot is straighting its self out on the wall
+		   sleep(200);
 		
 		driveLeft(8,1,this);
-		
-		sleep(200);
+		//drives left so it doesnt get stuck on the wall
+		   sleep(200);
 		
 		driveForward(55,1,this);
+		   sleep(200);
 		
-		sleep(200);
-		
-		robot.markerDropperdeposit();
+		rotateCW(180,1);
+		   sleep(200);
+
+		   driveBackward(5,1,this);
+		      sleep(200);
+
+		   robot.markerDropperdeposit();
+		//drops the team marker
+		//in case the team marker gets stuck on the dropper it shakes it off
+		driveBackward(10,1,this);
+		   sleep(100);
 		
 		driveForward(5,1,this);
-		
-		sleep(100);
-		
+		   sleep(100);
+
 		driveBackward(5,1,this);
-		
-		sleep(100);
+		   sleep(100);
 		
 		driveForward(5,1,this);
-		
-		sleep(100);
-		
-		driveBackward(5,1,this);
-		
-		sleep(100);
-		
+		   sleep(100);
+		//ending the shake off
+
 		driveBackward(30,1,this);
+		   sleep(200);
 		
-		sleep(200);
+		rotateCCW(180,1);
+		   sleep(200);
+
+		   driveLeft(4,1,this);
+		//puts it back up against the wall
+		   sleep(200);
+
+		driveRight(2,.3,this);
+		   sleep(200);
+
+		driveForward(20,1,this);
+		   sleep(200);
 		
-		driveRight(4,1,this);
-		
-		sleep(200);
-		
-		driveBackward(20,1,this);
-		
-		sleep(200);
-		
-		driveBackward(12,.4,this);
+		driveForward(15,.4,this);
+		   sleep(200);
 	}
 	
-	void knockOffCenter(){
+	void knockOffCenter(){//justs drives forwards and backwards
 	
-	driveForward(25,.5,this);
-		
-		sleep(200);
+		driveForward(25,.5,this);
+		   sleep(200);
 		
 	driveBackward(15,.5,this);
-	
-	
-	
 	}
-	
+
 	void knockOffRight()
 	{
-	    
-	    driveForward(5,1,this);
-		
+	    //justs drives forward and knocks of the middle\
+		// 	driveForward(5,1,this);
 	    sleep(200);
 	    
-		driveRight(15,1,this);
+		driveForward(2,.5,this);
+	       sleep(200);
+
+	    driveRight(15,1,this);
+		   sleep(200);
 	    
-	    sleep(200);
-	    
-	    driveForward(15,.5,this);
-	    
-	    sleep(200);
+	    driveForward(20,.5,this);
+	       sleep(200);
 	    
 	    driveBackward(15,.5,this);
-	    
-	    sleep(200);
+	       sleep(200);
 	    
 	    driveLeft(15,1,this);
-	
+	       sleep(200);
 	}
-	
-	
-	
+
+	void knockOffLeft()//make sure it doesnt hit the landers leg
+	{
+
+	driveForward(5,1,this);
+	   sleep(200);
+
+	driveLeft(15,1,this);
+	   sleep(200);
+
+	driveForward(20,1,this);
+	   sleep(200);
+
+	driveBackward(20,1,this);
+	   sleep(200);
+
+	driveRight(15,1,this);
+	   sleep(200);
+	}
+	//squiggle is the end of the entire code
 }
