@@ -80,7 +80,15 @@ public class TeleOp_v1 extends OpMode {
 		}else{
 			robot.collectorStop();
 		}
-		
+
+		if (gamepad1.x==true) {
+			robot.collectorServo.setPower(1);
+		}   else if (gamepad1.y==true){
+			robot.collectorServo.setPower(-1);
+		}   else {
+			robot.collectorServo.setPower(0);
+		}
+
 		telemetry.addData("Gyro Z (first)", robot.gyro.getOrientation().firstAngle);
 		telemetry.addData("Gyro Y (second)", robot.gyro.getOrientation().secondAngle);
 		telemetry.addData("Gyro X (third)", robot.gyro.getOrientation().thirdAngle);
