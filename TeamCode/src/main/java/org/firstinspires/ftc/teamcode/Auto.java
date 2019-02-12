@@ -397,8 +397,8 @@ public abstract class Auto extends LinearOpMode {
 	
 	public void lowerBot()
 	{
-		
-		while(!isStopRequested() && robot.gyro.getOrientation().secondAngle < 0)
+
+		while(!isStopRequested() && robot.gyro.getOrientation().secondAngle >-85)
 		{
 			robot.runArm(-.5);
 			telemetry.addData("Angle", robot.gyro.getOrientation().secondAngle);
