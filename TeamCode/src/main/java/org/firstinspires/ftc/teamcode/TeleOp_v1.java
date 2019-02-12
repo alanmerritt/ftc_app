@@ -81,10 +81,9 @@ public class TeleOp_v1 extends OpMode {
 			robot.collectorStop();
 		}
 
-		if (gamepad1.x==true) {
+		if (gamepad2.x==true) {
 			robot.collectorServo.setPower(1);
-		}   else if (gamepad1.y==true){
-			robot.collectorServo.setPower(-1);
+		}   else if (gamepad2.y==true){
 		}   else {
 			robot.collectorServo.setPower(0);
 		}
