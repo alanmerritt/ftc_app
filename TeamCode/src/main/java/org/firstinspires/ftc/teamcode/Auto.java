@@ -359,6 +359,24 @@ public abstract class Auto extends LinearOpMode {
 		
 	}
 	
+//	public void rotateCW(double degrees, double power)
+//	{
+//
+//		//Get the absolute value of the inputs to
+//		//make sure no one does anything funny.
+//		double deg = Math.abs(degrees);
+//		double pow = Math.abs(power);
+//
+//		//Drive the robot while the correct yaw value is not reached.
+//		while(robot.gyro.getYaw() > -deg && opModeIsActive())
+//		{
+//			robot.runMotors(pow, pow, pow, pow);
+//		}
+//
+//		robot.stopDrive();
+//
+//	}
+	
 	public void rotateCW(double degrees, double power)
 	{
 		
@@ -368,14 +386,33 @@ public abstract class Auto extends LinearOpMode {
 		double pow = Math.abs(power);
 		
 		//Drive the robot while the correct yaw value is not reached.
-		while(robot.gyro.getYaw() > -deg && opModeIsActive())
+		while(robot.gyro.getTotalYaw() > -deg && opModeIsActive())
 		{
+			robot.gyro.updateYaw();
 			robot.runMotors(pow, pow, pow, pow);
 		}
 		
 		robot.stopDrive();
 		
 	}
+	
+//	public void rotateCCW(double degrees, double power)
+//	{
+//
+//		//Get the absolute value of the inputs to
+//		//make sure no one does anything funny.
+//		double deg = Math.abs(degrees);
+//		double pow = Math.abs(power);
+//
+//		//Drive the robot while the correct yaw value is not reached.
+//		while(robot.gyro.getYaw() < deg && opModeIsActive())
+//		{
+//			robot.runMotors(-pow, -pow, -pow, -pow);
+//		}
+//
+//		robot.stopDrive();
+//
+//	}
 	
 	public void rotateCCW(double degrees, double power)
 	{
@@ -386,8 +423,9 @@ public abstract class Auto extends LinearOpMode {
 		double pow = Math.abs(power);
 		
 		//Drive the robot while the correct yaw value is not reached.
-		while(robot.gyro.getYaw() < deg && opModeIsActive())
+		while(robot.gyro.getTotalYaw() < deg && opModeIsActive())
 		{
+			robot.gyro.updateYaw();
 			robot.runMotors(-pow, -pow, -pow, -pow);
 		}
 		
@@ -397,8 +435,8 @@ public abstract class Auto extends LinearOpMode {
 	
 	public void lowerBot()
 	{
-
-		while(!isStopRequested() && robot.gyro.getOrientation().secondAngle >-85)
+		
+		while(!isStopRequested() && robot.gyro.getOrientation().secondAngle > -85)
 		{
 			robot.runArm(-.5);
 			telemetry.addData("Angle", robot.gyro.getOrientation().secondAngle);
