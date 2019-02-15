@@ -25,10 +25,22 @@ public class Full_Crater extends Auto {
 	
 	driveForward(3,1,this);
 	   sleep(200);
-	
-	driveRight(5,1,this);
-	   sleep(200);
-	
+
+	   driveRight(6,1,this);
+	      sleep(200);
+
+
+
+
+	   robot.collectorServo1.setPower(1);
+	   robot.collectorServo2.setPower(-1);
+
+	   sleep(5000);
+
+	   robot.collectorServo1.setPower(0);
+		robot.collectorServo2.setPower(0);
+
+
 	robot.markerDropperretract();
 		//Start detecting the elements.
 	activateElementDetection();
@@ -58,7 +70,7 @@ public class Full_Crater extends Auto {
 	else
 	{
 
-		telemetry.addLine("!!!Warning! Position could not be determined.!!!");
+		telemetry.addLine("Sherman you broke me i have a wife and kids how could you do this(Warning!!! position could not be determined)!!!");
 		telemetry.update();
 
 		knockOffCenter();
@@ -185,4 +197,6 @@ public class Full_Crater extends Auto {
 	   sleep(200);
 	}
 	//squiggle is the end of the entire code
+
+
 }

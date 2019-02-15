@@ -21,7 +21,7 @@ public class TeleOp_v1 extends OpMode {
 	private boolean driveButtonLast = false;
 	private boolean driveMode = false;
 	private DcMotor extendanator;
-	private CRServo collectorServo;
+
 	
 	@Override
 	public void init() {
@@ -29,7 +29,7 @@ public class TeleOp_v1 extends OpMode {
 		robot = new Robot(this);
 		
 		extendanator= hardwareMap.dcMotor.get("extendanator");
-		collectorServo=hardwareMap.crservo.get("cs");
+
 		
 	}
 	
@@ -73,19 +73,12 @@ public class TeleOp_v1 extends OpMode {
 		
 		extendanator.setPower(gamepad2.right_stick_y);
 		
-		if(gamepad2.a==true) {
-			robot.collectorForward();
-		} else if(gamepad2.b==true){
-			robot.collectorReverse();
-		}else{
-			robot.collectorStop();
-		}
+		if(gamepad2.a)
+		{
 
-		if (gamepad2.x==true) {
-			robot.collectorServo.setPower(1);
-		}   else if (gamepad2.y==true){
-		}   else {
-			robot.collectorServo.setPower(0);
+			robot.collectorServo1.setPower(1);
+			robot.collectorServo2.setPower(-1);
+
 		}
 
 		telemetry.addData("Gyro Z (first)", robot.gyro.getOrientation().firstAngle);

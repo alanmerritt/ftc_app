@@ -48,9 +48,11 @@ public class Robot {
 	double offset;
 	
 	DcMotor[] armMotors;
-	
-	CRServo collectorServo;
+
 	Servo teamMarkerServo;
+
+	public CRServo collectorServo1;
+	public CRServo collectorServo2;
 	
 	/**
 	 * Initializes the robot.
@@ -64,7 +66,12 @@ public class Robot {
 		frontRight = opmode.hardwareMap.dcMotor.get("fr");
 		backRight = opmode.hardwareMap.dcMotor.get("br");
 		backLeft = opmode.hardwareMap.dcMotor.get("bl");
-		
+
+		frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 		frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 		frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 		backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -82,7 +89,9 @@ public class Robot {
 		armMotors[1] = opmode.hardwareMap.dcMotor.get("armMotor1");
 		armMotors[2] = opmode.hardwareMap.dcMotor.get("armMotor2");
 		
-		collectorServo = opmode.hardwareMap.crservo.get("collectorServo");
+		collectorServo1 = opmode.hardwareMap.crservo.get("collectorServo1");
+		collectorServo2 = opmode.hardwareMap.crservo.get("collectorServo2");
+
 		teamMarkerServo = opmode.hardwareMap.servo.get("teamMarkerServo");
 		
 	}
@@ -228,21 +237,9 @@ public class Robot {
 		return gyro.getYaw() - offset;
 	}
 	
-	public void collectorForward()
-	{
-		collectorServo.setPower(-1);
-	}
-	
-	public void collectorReverse()
-	{
-		collectorServo.setPower(1);
-	}
-	
-	public void collectorStop()
-	{
-		collectorServo.setPower(0);
-	}
-	
+
+
+
 	public void markerDropperretract() {teamMarkerServo.setPosition(1); }
 	
 	public void markerDropperdeposit() {teamMarkerServo.setPosition(0);}

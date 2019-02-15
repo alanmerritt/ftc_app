@@ -189,7 +189,11 @@ public abstract class Auto extends LinearOpMode {
 		{
 			
 			linearOp.telemetry.addLine("Driving forward.");
-			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+//			linearOp.telemetry.addData("Distance", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.addData("Front Left", robot.frontLeft.getCurrentPosition());
+			linearOp.telemetry.addData("Front Right", robot.frontRight.getCurrentPosition());
+			linearOp.telemetry.addData("Back Right", robot.backRight.getCurrentPosition());
+			linearOp.telemetry.addData("Back Left", robot.backLeft.getCurrentPosition());
 			linearOp.telemetry.update();
 			
 			//Drive the robot forward.
@@ -438,7 +442,7 @@ public abstract class Auto extends LinearOpMode {
 		
 		while(!isStopRequested() && robot.gyro.getOrientation().secondAngle > -85)
 		{
-			robot.runArm(-.5);
+			robot.runArm(-1);
 			telemetry.addData("Angle", robot.gyro.getOrientation().secondAngle);
 			telemetry.update();
 		}
