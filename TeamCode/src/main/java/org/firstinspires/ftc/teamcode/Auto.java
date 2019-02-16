@@ -809,9 +809,11 @@ public abstract class Auto extends LinearOpMode {
 		}
 	
 	}
-	
+
+
 	protected void activateElementDetection()
 	{
+
 		if(tfod != null)
 		{
 			tfod.activate();
@@ -833,7 +835,7 @@ public abstract class Auto extends LinearOpMode {
 		time.reset();
 		
 		//The amount of time allotted for the computer vision to run its course.
-		final int TIMEOUT = 5000;
+		final int TIMEOUT = 3000;
 		
 		//While stop has not been pressed and the timer has not exceeded the limit.
 		while(!isStopRequested() && time.time() < TIMEOUT) {
