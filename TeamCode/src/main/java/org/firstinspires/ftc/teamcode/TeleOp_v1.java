@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * Created by MerrittAM on 11/4/2018.
@@ -20,7 +21,7 @@ public class TeleOp_v1 extends OpMode {
 	private boolean driveButton = false;
 	private boolean driveButtonLast = false;
 	private boolean driveMode = false;
-	private DcMotor extendanator;
+	
 
 	
 	@Override
@@ -28,8 +29,6 @@ public class TeleOp_v1 extends OpMode {
 		
 		robot = new Robot(this);
 		
-		extendanator= hardwareMap.dcMotor.get("extendanator");
-
 		
 	}
 	
@@ -53,10 +52,10 @@ public class TeleOp_v1 extends OpMode {
 		//Run a different drive mode depending on the mode.
 		if (driveMode) {
 			robot.driverCentricDrive(x, y, r);
-			telemetry.addData("Drive Mode", "Driver Centric");
-		} else {
-			robot.robotCentricDrive(x, y, r);
 			telemetry.addData("Drive Mode", "Field Centric");
+		} else {
+			robot.robotCentricDrive(x, y, -r);
+			telemetry.addData("Drive Mode", "Robot Centric");
 		}
 		
 		//Reset the gyroscope offset.
@@ -71,19 +70,38 @@ public class TeleOp_v1 extends OpMode {
 		//Update the edge detection variables.
 		driveButtonLast = driveButton;
 		
-		extendanator.setPower(gamepad2.right_stick_y);
+		robot.extendanator.setPower(gamepad2.right_stick_y);
+		
 		
 		if(gamepad2.a)
 		{
-
-			robot.collectorServo1.setPower(1);
-			robot.collectorServo2.setPower(-1);
-
+			robot.collectorIntake();
 		}
-
-		telemetry.addData("Gyro Z (first)", robot.gyro.getOrientation().firstAngle);
-		telemetry.addData("Gyro Y (second)", robot.gyro.getOrientation().secondAngle);
-		telemetry.addData("Gyro X (third)", robot.gyro.getOrientation().thirdAngle);
+		else if(gamepad2.b)
+		{
+			robot.collectorDeposit();
+		}
+		else
+		{
+			robot.collectorServoStop();
+		}
+		
+//		robot.collectorRotateForward(gamepad2.right_trigger);
+//		robot.collectorRotateBackward(gamepad2.left_trigger);
+//
+//		telemetry.addData("Collector rotation", robot.collectorCurrentRotation);
+//
+		
+		robot.collectorCurrentRotation += ((gamepad1.left_trigger - gamepad1.right_trigger) + (gamepad2.left_trigger - gamepad2.right_trigger))/150;
+		robot.collectorCurrentRotation = Range.clip(robot.collectorCurrentRotation, 0, 1);
+		robot.collectorRotator.setPosition(robot.collectorCurrentRotation);
+		
+		telemetry.addData("Left Trigger", gamepad1.left_trigger);
+		telemetry.addData("Current Rotation", robot.collectorCurrentRotation);
+		
+//		telemetry.addData("Gyro Z (first)", robot.gyro.getOrientation().firstAngle);
+//		telemetry.addData("Gyro Y (second)", robot.gyro.getOrientation().secondAngle);
+//		telemetry.addData("Gyro X (third)", robot.gyro.getOrientation().thirdAngle);
 		
 		telemetry.update();
 		

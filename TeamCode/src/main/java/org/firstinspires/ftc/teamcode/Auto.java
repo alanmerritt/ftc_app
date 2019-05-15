@@ -889,6 +889,124 @@ public abstract class Auto extends LinearOpMode {
 								
 							}
 							
+						}
+						
+						//TODO: Make sure this still works.
+						
+						//If the values have not changed, then there was not enough information.
+						//If they have changed, then we can determine the positions.
+						if (lowestGoldPos.x != ERROR_FLAG &&
+								lowestSilverPos.x != ERROR_FLAG &&
+								secondLowestSilverPos.x != ERROR_FLAG) {
+							
+							//If the x position of the gold is less than the x positions of both
+							//silvers, then the gold element is on the left.
+							if (lowestGoldPos.x < lowestSilverPos.x && lowestGoldPos.x < secondLowestSilverPos.x)
+							{
+								//Gold element is in LEFT position.
+								return ElementPosition.LEFT;
+							} //If the x position of the gold is greater than the x positions of
+							//both silvers, then the gold element is on the right.
+							else if (lowestGoldPos.x > lowestSilverPos.x && lowestGoldPos.x > secondLowestSilverPos.x)
+							{
+								//Gold element is in RIGHT position.
+								return ElementPosition.RIGHT;
+							} //If the x position of the gold is not greater than both or less
+							//than both, then the gold element is in the middle.
+							else
+							{
+								//Gold element is in CENTER position.
+								return ElementPosition.CENTER;
+							}
+						
+						}
+						
+						
+					} else {
+						telemetry.addLine("Not enough objects detected.");
+					}
+					
+				}
+				
+			} else {
+				telemetry.addLine("!!!Warning! Problem with TensorFlow.!!!");
+			}
+			
+			telemetry.update();
+			
+		}
+		
+		return ElementPosition.UNKNOWN;
+		
+	}
+	
+	protected ElementPosition detectRightElements()
+	{
+		
+		//A timer to end the object detection if it has not returned after a certain time.
+		ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+		time.reset();
+		
+		//The amount of time allotted for the computer vision to run its course.
+		final int TIMEOUT = 3000;
+		
+		//While stop has not been pressed and the timer has not exceeded the limit.
+		while(!isStopRequested() && time.time() < TIMEOUT) {
+			
+			if (tfod != null) {
+				
+				//Get a list of all the recognized objects.
+				List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+				if (updatedRecognitions != null) {
+					
+					telemetry.addData("# of objects detected", updatedRecognitions.size());
+					
+					//If three or more objects are detected.
+					if (updatedRecognitions.size() >= 2) {
+						
+						final int ERROR_FLAG = -1;
+						
+						//Initialize the positions to error flags. If the values of the vectors
+						//are still equal to the error flags at the end, we know that something
+						//went wrong or the correct information was not available.
+						Vector lowestGoldPos = new Vector(ERROR_FLAG, ERROR_FLAG);
+						Vector lowestSilverPos = new Vector(ERROR_FLAG, ERROR_FLAG);
+						Vector secondLowestSilverPos = new Vector(ERROR_FLAG, ERROR_FLAG);
+						
+						//Loop through all the recognized objects.
+						for (Recognition recognition : updatedRecognitions) {
+							
+							//If it is a gold element, check if it is the lowest.
+							if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+								//If there is a gold object lower on the screen
+								//(higher y value), set its position as the lowest so far.
+								if (lowerThan(recognition, lowestGoldPos)) {
+									lowestGoldPos.x = recognition.getLeft();
+									lowestGoldPos.y = recognition.getTop();
+								}
+							} else {
+								//Check if it is lower than the lowest so far.
+								if (lowerThan(recognition, lowestSilverPos)) {
+									//The current lowest silver is now the second lowest.
+									secondLowestSilverPos = lowestSilverPos.copy();
+									
+									//Update the lowest position.
+									lowestSilverPos.x = recognition.getLeft();
+									lowestSilverPos.y = recognition.getTop();
+									
+								} //Check if it is higher than the lowest, but lower than the second.
+								else if (lowerThan(recognition, secondLowestSilverPos)) {
+									secondLowestSilverPos.x = recognition.getLeft();
+									secondLowestSilverPos.y = recognition.getTop();
+								}
+								
+							}
+							
+						}
+							
+						
+						
+							/*
 							//If the values have not changed, then there was not enough information.
 							//If they have changed, then we can determine the positions.
 							if (lowestGoldPos.x != ERROR_FLAG &&
@@ -916,9 +1034,9 @@ public abstract class Auto extends LinearOpMode {
 								}
 								
 								
-							}
+							}*/
 							
-						}
+						
 						
 						
 					} else {
@@ -965,5 +1083,7 @@ public abstract class Auto extends LinearOpMode {
 			telemetry.update();
 		}
 	}
+	
+	
 	
 }

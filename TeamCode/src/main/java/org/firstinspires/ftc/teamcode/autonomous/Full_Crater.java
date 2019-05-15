@@ -33,20 +33,12 @@ public class Full_Crater extends Auto {
 
 	   driveRight(6,1,this);
 	      sleep(100);
-
-
-
-
-	   robot.collectorServo1.setPower(1);
-	   robot.collectorServo2.setPower(-1);
-
-	   sleep(5000);
-
-	   robot.collectorServo1.setPower(0);
-		robot.collectorServo2.setPower(0);
-
-
-	robot.markerDropperretract();
+		
+	      driveLeft(3,.5,this);
+	
+	      //Realign.
+	      rotateCCW(2, .2);
+	      
 		//Start detecting the elements.
 //	activateElementDetection();
 	
@@ -89,30 +81,58 @@ public class Full_Crater extends Auto {
 		rotateCCW(50,1);
 		   sleep(100);
 		
-		driveLeft(7,1,this);
+		driveRight(5,1,this);
 		   sleep(100);
-
-		driveForward(35,1,this);
+		   
+		   driveForward(35,1,this);
 		   sleep(100);
 		
-		rotateCCW(120,1);
+		rotateCCW(130,1);
 		   sleep(100);
 
-		   driveRight(5,1,this);
+		   driveRight(7,1,this);
 		      sleep(100);
 
 
-		      driveForward(55,1,this);
-		   sleep(100);
+		      driveForward(50,1,this);
+		   sleep(100);	   //Lower arm.
+		   robot.runArm(.5);
+		   sleep(1000);
+		   robot.stopArm();
+		
+			robot.extendanator.setPower(-.5);
+			sleep(500);
+			robot.extendanator.setPower(0);
+		   
+		   //Rotate the wrist.
+		   robot.collectorRotator.setPosition(1);
+		   
+		   //Run the collector out.
+		   robot.collectorDeposit();
+		   
+		   sleep(1000);
+		   
+		   //Stop the collector.
+		   robot.collectorServoStop();
 
-		   robot.markerDropperdeposit();
+		driveBackward(50,1,this);
 		   sleep(100);
-
-		driveBackward(70,1,this);
+		   
+		driveBackward(10,.5,this);
+		
 	}
+	
+	
+	
 	
 	void knockOffCenter(){//justs drives forwards and backwards
 	
+		rotateCCW(2,.2);
+		   sleep(100);
+		
+		   driveLeft(3,1,this);
+		      sleep(100);
+		   
 		driveForward(30,.5,this);
 		   sleep(100);
 		
@@ -146,13 +166,13 @@ public class Full_Crater extends Auto {
 	driveForward(10,1,this);
 	   sleep(100);
 
-	driveLeft(10,.7,this);
+	driveLeft(15,1,this);
 	   sleep(100);
 
-	driveForward(30,1,this);
+	driveForward(20,1,this);
 	   sleep(100);
 
-	driveBackward(20,1,this);
+	driveBackward(15,1,this);
 	   sleep(100);
 
 	driveRight(15,1,this);

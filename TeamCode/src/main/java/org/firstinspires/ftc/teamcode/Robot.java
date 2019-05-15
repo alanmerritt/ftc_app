@@ -48,11 +48,15 @@ public class Robot {
 	double offset;
 	
 	DcMotor[] armMotors;
-
+	public DcMotor extendanator;
+	
 	Servo teamMarkerServo;
 
 	public CRServo collectorServo1;
 	public CRServo collectorServo2;
+	
+	public double collectorCurrentRotation;
+	public Servo collectorRotator;
 	
 	/**
 	 * Initializes the robot.
@@ -89,9 +93,17 @@ public class Robot {
 		armMotors[1] = opmode.hardwareMap.dcMotor.get("armMotor1");
 		armMotors[2] = opmode.hardwareMap.dcMotor.get("armMotor2");
 		
+		extendanator = opmode.hardwareMap.dcMotor.get("extendanator");
+		
+		//The two CR servos controlling the intake wheels.
 		collectorServo1 = opmode.hardwareMap.crservo.get("collectorServo1");
 		collectorServo2 = opmode.hardwareMap.crservo.get("collectorServo2");
-
+		//The two servos that rotate the collector
+		//box are tied together with a Y-splitter.
+		collectorRotator = opmode.hardwareMap.servo.get("collectorRotator");
+		collectorCurrentRotation = .5;
+		collectorRotator.setPosition(collectorCurrentRotation);
+		
 		teamMarkerServo = opmode.hardwareMap.servo.get("teamMarkerServo");
 		
 	}
@@ -237,9 +249,53 @@ public class Robot {
 		return gyro.getYaw() - offset;
 	}
 	
-
-
-
+	
+	public void collectorIntake()
+	{
+		//TODO: These powers may need to be reversed.
+		collectorServo1.setPower(1);
+		collectorServo2.setPower(-1);
+	}
+	
+	public void collectorDeposit()
+	{
+		//TODO: These powers may need to be reversed.
+		collectorServo1.setPower(-1);
+		collectorServo2.setPower(1);
+	}
+	
+	public void collectorServoStop()
+	{
+		collectorServo1.setPower(0);
+		collectorServo2.setPower(0);
+	}
+	
+	//TODO: Direction may need to be reversed.
+	public void collectorRotateForward(double speed)
+	{
+		double s = Math.abs(speed);
+		if(collectorCurrentRotation < s)
+		{
+			collectorCurrentRotation += .05;
+			collectorRotator.setPosition(collectorCurrentRotation);
+			opmode.telemetry.addData("Speed Forward", speed);
+			
+		}
+	}
+	
+	//TODO: Direction may need to be reversed.
+	public void collectorRotateBackward(double speed)
+	{
+		double s = Math.abs(speed);
+		if(collectorCurrentRotation > 0.0)
+		{
+			collectorCurrentRotation -= s;
+			collectorRotator.setPosition(collectorCurrentRotation);
+			opmode.telemetry.addData("Speed Backward", speed);
+			
+		}
+	}
+	
 	public void markerDropperretract() {teamMarkerServo.setPosition(1); }
 	
 	public void markerDropperdeposit() {teamMarkerServo.setPosition(0);}
